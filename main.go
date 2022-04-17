@@ -2,28 +2,31 @@ package main
 
 import "fmt"
 
-var STD_PAYE_RATE float32 = 36800
+var StdPayeRate float32 = 36800
+var TaxCredits float32 = 3400
 
 func main() {
 	fmt.Println("Hello World")
-	var myPay float32 = 65000
+	var myPay float32 = 48360
 	var paye float32 = yearlyPayeCaluclator(myPay)
 	var usc float32 = yearlyUscCaluclator(myPay)
+	var prsi float32 = yearlyPrsiCalculator(myPay)
 	fmt.Println("PAYE: ", paye)
 	fmt.Println("USC: ", usc)
-	fmt.Println("net pay: ", myPay-(usc+paye))
+	fmt.Println("PRSI: ", prsi)
+	fmt.Println("net pay: ", myPay-(usc+paye+prsi))
 }
 
 func yearlyPayeCaluclator(grossPay float32) float32 {
-	if grossPay < STD_PAYE_RATE {
-		return grossPay * 0.8
+	if grossPay < StdPayeRate {
+		return (grossPay * 0.2) - TaxCredits
 	}
-	higherBracketTax := (grossPay - STD_PAYE_RATE) * 0.4
-	lowerBracketTax := STD_PAYE_RATE * 0.2
+	higherBracketTax := (grossPay - StdPayeRate) * 0.4
+	lowerBracketTax := StdPayeRate * 0.2
 
 	fmt.Println(higherBracketTax, lowerBracketTax)
 
-	return higherBracketTax + lowerBracketTax
+	return higherBracketTax + lowerBracketTax - TaxCredits
 }
 
 func yearlyUscCaluclator(grossPay float32) float32 {
@@ -40,4 +43,11 @@ func yearlyUscCaluclator(grossPay float32) float32 {
 	}
 	var fourAndHalfPercent float32 = (70044 - 21295) * 0.045
 	return ((grossPay - 70044) * 0.08) + halfPercent + twoPercent + fourAndHalfPercent
+}
+
+func yearlyPrsiCalculator(grossPay float32) float32 {
+	if grossPay < 18304 {
+		return 0
+	}
+	return grossPay * 0.04
 }
